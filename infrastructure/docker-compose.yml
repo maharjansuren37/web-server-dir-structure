@@ -2,19 +2,26 @@ services:
   nginx:
     image: nginx:alpine
     restart: unless-stopped
-    ports: 
+    ports:
       - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      - ./nginx/upstreams:/etc/nginx/upstreams:ro
-      - /home/pi/apps/static/portfolio/public:/sites/portfolio:ro
-      - /home/pi/data/uploads:/uploads:ro
-      - /home/pi/logs/nginx:/var/log/nginx
+      - ./upstreams:/etc/nginx/upstreams:ro
+      - /home/applepie/server/apps/static/portfolio/public:/sites/portfolio:ro
+      - /home/applepie/server/data/uploads:/uploads:ro
+      - /home/applepie/server/logs/nginx:/var/log/nginx
     networks:
       - web
     depends_on:
-      - cloudflared
+      cloudflared:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'echo > /dev/tcp/localhost/80'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   cloudflared:
     image: cloudflare/cloudflared:latest
@@ -24,8 +31,53 @@ services:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
     networks:
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -x cloudflared"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
-  networks:
-    web:
-      name: web
-      driver: bridge
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: app_db
+    volumes:
+      - /home/applepie/server/db:/var/lib/postgresql/data
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  registry:
+    image: registry:2
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+      REGISTRY_STORAGE_FILESYSTEM_ROOTDIRECTORY: /var/lib/registry
+    volumes:
+      - ./registry/data:/var/lib/registry
+      - ./registry/auth:/auth
+      - /home/applepie/server/registry:/var/lib/registry  # persistent storage on Pi
+    networks:
+      - web
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/v2/_catalog"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  web:
+    driver: bridge

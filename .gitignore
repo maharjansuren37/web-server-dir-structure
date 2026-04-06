@@ -1,0 +1,140 @@
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+releases/**/*.env
+releases/**/*.env.*
+/etc/cloudflared/credentials.json
+
+# Docker & Registry
+registry/
+docker-compose.override.yml
+
+# Database
+*.sqlite
+*.db
+pgdata/
+
+# Uploads (user-generated content – never in Git)
+/home/applepie/server/data/uploads/
+uploads/
+*.upload
+
+# Backup artifacts
+backups/
+*.tar.gz
+*.bak
+*.backup
+
+# Logs (real logs, not the .md placeholders)
+logs/nginx/*.log
+logs/nginx/*.log.*
+/home/applepie/server/logs/
+*.log
+
+# Persistent data (on Pi)
+/home/applepie/server/apps/static/portfolio/public/
+/home/applepie/server/db/
+/home/applepie/server/data/
+/home/applepie/server/releases/dynamic/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+.cache/
+*.tmp
+
+# Test coverage
+coverage/
+
+# Build artifacts (if building locally)
+dist/
+build/
+.next/
+.nuxt/
+.output/
+
+# Dependencies
+node_modules/
+vendor/
+.gems/
+
+# Dependency lock files (optional – keep if you want reproducibility)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# Gemfile.lock
+# composer.lock
+
+# OS generated files
+Thumbs.db
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# SSL certificates (self-signed)
+ssl/
+*.crt
+*.key
+*.pem
+*.p12
+
+# cAdvisor / Monitoring data (if used)
+prometheus/
+grafana/
+loki/
+
+# CI/CD
+.github/workflows/*.log
+.gitlab-ci.yml/cache/
+
+# Terraform / Ansible (if used)
+.terraform/
+.terraform.lock.hcl
+ansible/.retry
+ansible/.vault_pass
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Go
+bin/
+pkg/
+
+# Rust
+target/
+Cargo.lock
+
+# Misc
+*.md.backup
+*.md.bak

@@ -6,8 +6,6 @@ ingress:
     service: http://nginx:80
   - hostname: www.yourname.com
     service: http://nginx:80
-  - hostname: blog.yourname.com
-    service: http://nginx:80
   - hostname: app.yourname.com
     service: http://nginx:80
   - hostname: registry.yourname.com

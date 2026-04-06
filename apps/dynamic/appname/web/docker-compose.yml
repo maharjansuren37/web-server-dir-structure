@@ -4,18 +4,30 @@ services:
     restart: unless-stopped
     env_file:
       - .env
-      - /home/pi/releases/dynamic/app/web/blue.env
+      - /home/applepie/serverreleases/dynamic/app/web/blue.env
     networks:
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
   app_web_green:
     image: registry.yourname.com/app-web:${GREEN_VERSION:-latest}
     restart: unless-stopped
     env_file:
       - .env
-      - /home/pi/releases/dynamic/app/web/green.env
+      - /home/applepie/releases/dynamic/app/web/green.env
     networks:
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
 
 networks:
   web:

@@ -1,0 +1,23 @@
+services:
+  app_web_blue:
+    image: registry.yourname.com/app-web:${BLUE_VERSION:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+      - /home/pi/releases/dynamic/app/web/blue.env
+    networks:
+      - web
+
+  app_web_green:
+    image: registry.yourname.com/app-web:${GREEN_VERSION:-latest}
+    restart: unless-stopped
+    env_file:
+      - .env
+      - /home/pi/releases/dynamic/app/web/green.env
+    networks:
+      - web
+
+networks:
+  web:
+    name: web
+    external: true

@@ -1,0 +1,31 @@
+services:
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports: 
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/upstreams:/etc/nginx/upstreams:ro
+      - /home/pi/apps/static/portfolio/public:/sites/portfolio:ro
+      - /home/pi/data/uploads:/uploads:ro
+      - /home/pi/logs/nginx:/var/log/nginx
+    networks:
+      - web
+    depends_on:
+      - cloudflared
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - web
+
+  networks:
+    web:
+      name: web
+      driver: bridge
